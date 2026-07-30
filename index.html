@@ -77,7 +77,6 @@
         const xValText = document.getElementById('x-val');
         const yValText = document.getElementById('y-val');
 
-        // Lock screen function protects iOS display sleep timeout rules
         async function requestWakeLock() {
             try {
                 if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); }
@@ -90,7 +89,6 @@
             masterGain.gain.setValueAtTime(0, audioCtx.currentTime); 
             masterGain.connect(audioCtx.destination);
 
-            // 55Hz Base Pulse
             basePulseOsc = audioCtx.createOscillator();
             basePulseOsc.type = 'sine';
             basePulseOsc.frequency.setValueAtTime(55, audioCtx.currentTime);
@@ -98,7 +96,6 @@
             pulseGain.gain.setValueAtTime(0.25, audioCtx.currentTime);
             basePulseOsc.connect(pulseGain); pulseGain.connect(masterGain);
 
-            // 35Hz Prostate Hum
             analGrovelOsc = audioCtx.createOscillator();
             analGrovelOsc.type = 'sine';
             analGrovelOsc.frequency.setValueAtTime(35, audioCtx.currentTime);
@@ -106,7 +103,6 @@
             grovelGain.gain.setValueAtTime(0.35, audioCtx.currentTime);
             analGrovelOsc.connect(grovelGain); grovelGain.connect(masterGain);
 
-            // Brown Noise Fluid Streams (Bypasses missing asset loops)
             const bufferSize = audioCtx.sampleRate * 2;
             const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
             const data = buffer.getChannelData(0);
@@ -115,7 +111,7 @@
                 let white = Math.random() * 2 - 1;
                 data[i] = (lastOut + (0.02 * white)) / 1.02;
                 lastOut = data[i];
-                data[i] *= 3.5; // Soft amplification cushion
+                data[i] *= 3.5;
             }
             brownNoiseNode = audioCtx.createBufferSource();
             brownNoiseNode.buffer = buffer; brownNoiseNode.loop = true;
@@ -129,7 +125,6 @@
             brownNoiseNode.connect(brownNoiseFilter);
             brownNoiseFilter.connect(noiseGain); noiseGain.connect(masterGain);
 
-            // 12kHz Erection Accent Line
             erectIndicatorOsc = audioCtx.createOscillator();
             erectIndicatorOsc.type = 'sine';
             erectIndicatorOsc.frequency.setValueAtTime(12000, audioCtx.currentTime);
@@ -196,6 +191,7 @@
                 let cnv = p.createCanvas(container.offsetWidth, container.offsetHeight);
                 cnv.parent('canvas-container'); p.frameRate(30);
                 maxRadius = p.min(p.width, p.height) * 0.35;
+                p.background(2, 3, 12); // Initialize solid canvas background
             };
             p.windowResized = () => {
                 let container = document.getElementById('canvas-container');
@@ -203,7 +199,9 @@
                 maxRadius = p.min(p.width, p.height) * 0.35;
             };
             p.draw = () => {
-                p.fill(2, 3, 12, 35); p.rect(0, 0, p.width, p.height);
+                // FIXED: Explicitly drawing background clear inside local canvas loop
+                p.background(2, 3, 12);
+                
                 if (isEngineActive && globalIntroFade < 1.0) { globalIntroFade += 0.003; }
                 waveTimeline += 0.005; p.translate(p.width / 2, p.height / 2);
                 let totalWaveBands = 40;
@@ -215,7 +213,11 @@
                     let waveDeformA = p.sin(progress * p.TWO_PI * 2.5 - waveTimeline * 1.5);
                     let waveDeformB = p.cos(progress * p.PI + waveTimeline * 1.0);
                     let edgeFade = p.sin(progress * p.PI);
-                    let dynamicAlpha = p.pow(edgeFade, 1.6) * 190.0 * (isEngineActive ? globalIntroFade : 0.25);
+                    
+                    // Allow waves to display a faint idle pulse prior to clicking the button
+                    let currentAlpha = isEngineActive ? globalIntroFade : 0.4;
+                    let dynamicAlpha = p.pow(edgeFade, 1.6) * 190.0 * currentAlpha;
+                    
                     let colorNoise = p.noise(i * 0.04, waveTimeline * 0.2);
                     let r = p.int(p.map(colorNoise, 0, 1, 0, 5));
                     let g = p.int(p.map(colorNoise, 0, 1, 25, 120) + (simulatedHighErect * 80));
@@ -227,7 +229,7 @@
                     for (let j = 0; j <= wavePoints; j++) {
                         let theta = (j / wavePoints) * p.TWO_PI;
                         let jitter = p.sin(theta * 24.0 + p.frameCount) * (simulatedHighErect * 1.8);
-                        let noiseModifier = p.noise(p.cos(theta) * 0.4 + 1.0, p.sin(theta) * 0.4 + 1.0, waveTimeline);
+                        let noiseModifier = p.noise(p.max(0.1, p.cos(theta) * 0.4 + 1.0), p.max(0.1, p.sin(theta) * 0.4 + 1.0), waveTimeline);
                         let totalSwellFactor = 1.0 + (waveDeformA * waveDeformB * 0.07) * (noiseModifier * (tweakX * 1.2));
                         let finalRadius = (currentRadius * totalSwellFactor) + jitter;
                         let x = finalRadius * p.cos(theta); let y = finalRadius * p.sin(theta);
