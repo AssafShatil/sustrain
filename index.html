@@ -1,3 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sustrain - State B Sandbox</title>
+    <!-- iOS Native App Fullscreen Layer Configurations -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Sustrain">
+    <!-- Tailwind CSS Rendering Stylesheet -->
+    <script src="https://tailwindcss.com"></script>
+    <!-- p5.js Creative Code Visual Engine -->
+    <script src="https://cloudflare.com"></script>
+</head>
+<body class="bg-[#02030c] text-slate-200 min-h-screen flex flex-col justify-between items-center overflow-hidden font-sans select-none">
+
+    <!-- Top Branding Bar -->
+    <header class="w-full py-4 text-center border-b border-blue-950/40 bg-[#02030c]/80 backdrop-blur z-20">
+        <h1 class="text-xl font-bold tracking-[0.2em] text-blue-400 uppercase">Sustrain</h1>
+        <p class="text-xs text-slate-500 mt-0.5">Somatic Wave Architecture • State B</p>
+    </header>
+
+    <!-- Main Rendering Area -->
+    <main class="relative w-full flex-1 flex justify-center items-center overflow-hidden">
+        <!-- Canvas Container Anchor -->
+        <div id="canvas-container" class="absolute inset-0 w-full h-full z-0"></div>
+
+        <!-- Center Start Trigger Interface Panel -->
+        <div class="relative z-10 flex flex-col items-center gap-6 max-w-sm w-full px-6 text-center">
+            <button id="start-btn" class="px-8 py-4 bg-blue-600 hover:bg-blue-500 active:scale-95 transition-all rounded-full font-bold text-sm tracking-wider uppercase shadow-xl shadow-blue-500/20 border border-blue-400/30">
+                Initialize Sound World
+            </button>
+            <p id="status-text" class="text-xs text-slate-400 font-mono opacity-80 max-w-[240px] bg-slate-950/60 px-4 py-2 rounded-xl backdrop-blur-sm border border-blue-950/30">
+                Audio & visuals offline.<br>Connect headphones and tap to boot.
+            </p>
+        </div>
+    </main>
+
+    <!-- Bottom Adjustment Control Sliders Deck -->
+    <footer class="w-full p-6 bg-gradient-to-t from-[#02030c] via-[#02030c]/90 to-transparent z-20 max-w-md">
+        <div class="space-y-5 bg-slate-900/60 border border-blue-950/50 rounded-2xl p-5 backdrop-blur-md shadow-2xl">
+            <!-- X Slider Tracking Component -->
+            <div class="space-y-1.5">
+                <div class="flex justify-between text-xs font-semibold tracking-wider text-slate-400">
+                    <span class="uppercase">Swell Density (X)</span>
+                    <span id="x-val" class="font-mono text-blue-400">50%</span>
+                </div>
+                <input id="slider-x" type="range" min="0" max="100" value="50" class="w-full h-1.5 bg-blue-950 rounded-lg appearance-none cursor-pointer accent-blue-500 transition-all">
+            </div>
+
+            <!-- Y Slider Tracking Component -->
+            <div class="space-y-1.5">
+                <div class="flex justify-between text-xs font-semibold tracking-wider text-slate-400">
+                    <span class="uppercase">Pleasure Intensity (Y)</span>
+                    <span id="y-val" class="font-mono text-blue-400">50%</span>
+                </div>
+                <input id="slider-y" type="range" min="0" max="100" value="50" class="w-full h-1.5 bg-blue-950 rounded-lg appearance-none cursor-pointer accent-blue-500 transition-all">
+            </div>
+        </div>
+    </footer>
     <script>
         let audioCtx = null;
         let isEngineActive = false;
@@ -122,18 +183,19 @@
                 brownNoiseFilter.frequency.setTargetAtTime(targetCutoff, audioCtx.currentTime, 0.2);
             }
         });
+
+        // FIXED WEB DRAW ENVELOPE (Bypasses offsetWidth dimension calculations)
         const sketch = (p) => {
             let maxRadius;
             p.setup = () => {
-                let container = document.getElementById('canvas-container');
-                let cnv = p.createCanvas(container.offsetWidth, container.offsetHeight);
-                cnv.parent('canvas-container'); p.frameRate(30);
+                // Generates canvas directly to parent window sizes to prevent iOS layout failure
+                let cnv = p.createCanvas(p.windowWidth, p.windowHeight);
+                cnv.parent('canvas-container'); 
+                p.frameRate(30);
                 maxRadius = p.min(p.width, p.height) * 0.35;
-                p.background(2, 3, 12);
             };
             p.windowResized = () => {
-                let container = document.getElementById('canvas-container');
-                p.resizeCanvas(container.offsetWidth, container.offsetHeight);
+                p.resizeCanvas(p.windowWidth, p.windowHeight);
                 maxRadius = p.min(p.width, p.height) * 0.35;
             };
             p.draw = () => {
@@ -153,10 +215,10 @@
                     let currentAlpha = isEngineActive ? globalIntroFade : 0.4;
                     let dynamicAlpha = p.pow(edgeFade, 1.6) * 190.0 * currentAlpha;
                     
-                    let colorNoise = p.noise(i * 0.04, waveTimeline * 0.2);
-                    let r = p.int(p.map(colorNoise, 0, 1, 0, 5));
-                    let g = p.int(p.map(colorNoise, 0, 1, 25, 120) + (simulatedHighErect * 80));
+                    let r = p.int(p.noise(i * 0.04, waveTimeline * 0.2) * 5);
+                    let g = p.int(p.noise(i * 0.04, waveTimeline * 0.2) * 95 + 25 + (simulatedHighErect * 80));
                     let b = p.int(p.map(progress, 0, 1, 130, 255));
+                    
                     p.stroke(r, g, b, dynamicAlpha);
                     p.strokeWeight(p.map(progress, 0, 1, 0.8, 3.5) + (simulatedSubSwell * 2.5));
                     p.beginShape();
