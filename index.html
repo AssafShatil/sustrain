@@ -4,29 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sustrain - State B Sandbox</title>
-    <!-- iOS Standalone App UI Optimizations -->
+    <!-- iOS Fullscreen Setup Configurations -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Sustrain">
-    <!-- Tailwind CSS for modern layout design -->
+    <!-- Tailwind CSS Engine -->
     <script src="https://tailwindcss.com"></script>
-    <!-- p5.js for cross-platform generative visuals -->
+    <!-- p5.js Visual Render Engine -->
     <script src="https://cloudflare.com"></script>
 </head>
 <body class="bg-[#02030c] text-slate-200 min-h-screen flex flex-col justify-between items-center overflow-hidden font-sans select-none">
 
-    <!-- Header Block -->
+    <!-- Header Grid -->
     <header class="w-full py-4 text-center border-b border-blue-950/40 bg-[#02030c]/80 backdrop-blur z-20">
         <h1 class="text-xl font-bold tracking-[0.2em] text-blue-400 uppercase">Sustrain</h1>
         <p class="text-xs text-slate-500 mt-0.5">Somatic Wave Architecture • State B</p>
     </header>
 
-    <!-- Main Rendering Workspace -->
+    <!-- Main Active Workspace Portal -->
     <main class="relative w-full flex-1 flex justify-center items-center overflow-hidden">
-        <!-- p5.js Canvas Wrapper -->
+        <!-- p5.js Target Anchor -->
         <div id="canvas-container" class="absolute inset-0 w-full h-full flex justify-center items-center z-0"></div>
 
-        <!-- Interactive Core Trigger Overlay -->
+        <!-- Center Click Toggle Layer -->
         <div class="relative z-10 flex flex-col items-center gap-6 max-w-sm w-full px-6 text-center">
             <button id="start-btn" class="px-8 py-4 bg-blue-600 hover:bg-blue-500 active:scale-95 transition-all rounded-full font-bold text-sm tracking-wider uppercase shadow-xl shadow-blue-500/20 border border-blue-400/30">
                 Initialize Sound World
@@ -37,10 +37,10 @@
         </div>
     </main>
 
-    <!-- Bottom Adjustment Deck (Touch Responsive Sliders) -->
+    <!-- Mobile Tweak Adjustment Sliders Deck -->
     <footer class="w-full p-6 bg-gradient-to-t from-[#02030c] via-[#02030c]/90 to-transparent z-20 max-w-md">
         <div class="space-y-5 bg-slate-900/60 border border-blue-950/50 rounded-2xl p-5 backdrop-blur-md shadow-2xl">
-            <!-- X-Axis Control Grid -->
+            <!-- X Slider -->
             <div class="space-y-1.5">
                 <div class="flex justify-between text-xs font-semibold tracking-wider text-slate-400">
                     <span class="uppercase">Swell Density (X)</span>
@@ -49,7 +49,7 @@
                 <input id="slider-x" type="range" min="0" max="100" value="50" class="w-full h-1.5 bg-blue-950 rounded-lg appearance-none cursor-pointer accent-blue-500 transition-all">
             </div>
 
-            <!-- Y-Axis Control Grid -->
+            <!-- Y Slider -->
             <div class="space-y-1.5">
                 <div class="flex justify-between text-xs font-semibold tracking-wider text-slate-400">
                     <span class="uppercase">Pleasure Intensity (Y)</span>
@@ -59,8 +59,6 @@
             </div>
         </div>
     </footer>
-
-    <!-- Interactive Execution Layer -->
     <script>
         let audioCtx = null;
         let isEngineActive = false;
@@ -79,88 +77,67 @@
         const xValText = document.getElementById('x-val');
         const yValText = document.getElementById('y-val');
 
-        // Wake Lock API handles keeping mobile displays active during hands-free sessions
+        // Lock screen function protects iOS display sleep timeout rules
         async function requestWakeLock() {
             try {
-                if ('wakeLock' in navigator) {
-                    wakeLock = await navigator.wakeLock.request('screen');
-                }
-            } catch (err) {
-                console.warn(`Wake lock error: ${err.message}`);
-            }
+                if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); }
+            } catch (err) { console.warn(err.message); }
         }
-
-        document.addEventListener('visibilitychange', async () => {
-            if (wakeLock !== null && document.visibilityState === 'visible') {
-                wakeLock = await navigator.wakeLock.request('screen');
-            }
-        });
 
         function initAudioEngine() {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            
             masterGain = audioCtx.createGain();
             masterGain.gain.setValueAtTime(0, audioCtx.currentTime); 
             masterGain.connect(audioCtx.destination);
 
-            // 55Hz Somatic Pulse Generator
+            // 55Hz Base Pulse
             basePulseOsc = audioCtx.createOscillator();
             basePulseOsc.type = 'sine';
             basePulseOsc.frequency.setValueAtTime(55, audioCtx.currentTime);
             let pulseGain = audioCtx.createGain();
             pulseGain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-            basePulseOsc.connect(pulseGain);
-            pulseGain.connect(masterGain);
+            basePulseOsc.connect(pulseGain); pulseGain.connect(masterGain);
 
-            // 35Hz Grounding/Anus Pelvic Vibrator
+            // 35Hz Prostate Hum
             analGrovelOsc = audioCtx.createOscillator();
             analGrovelOsc.type = 'sine';
             analGrovelOsc.frequency.setValueAtTime(35, audioCtx.currentTime);
             let grovelGain = audioCtx.createGain();
             grovelGain.gain.setValueAtTime(0.35, audioCtx.currentTime);
-            analGrovelOsc.connect(grovelGain);
-            grovelGain.connect(masterGain);
+            analGrovelOsc.connect(grovelGain); grovelGain.connect(masterGain);
 
-            // Velvet Noise Engine Buffer
-            const bufferSize = 2 * audioCtx.sampleRate;
-            const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-            const output = noiseBuffer.getChannelData(0);
+            // Brown Noise Fluid Streams (Bypasses missing asset loops)
+            const bufferSize = audioCtx.sampleRate * 2;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            let lastOut = 0.0;
             for (let i = 0; i < bufferSize; i++) {
-                output[i] = Math.random() * 2 - 1;
+                let white = Math.random() * 2 - 1;
+                data[i] = (lastOut + (0.02 * white)) / 1.02;
+                lastOut = data[i];
+                data[i] *= 3.5; // Soft amplification cushion
             }
             brownNoiseNode = audioCtx.createBufferSource();
-            brownNoiseNode.buffer = noiseBuffer;
-            brownNoiseNode.loop = true;
+            brownNoiseNode.buffer = buffer; brownNoiseNode.loop = true;
 
             brownNoiseFilter = audioCtx.createBiquadFilter();
             brownNoiseFilter.type = 'lowpass';
             brownNoiseFilter.frequency.setValueAtTime(240, audioCtx.currentTime);
-            
             let noiseGain = audioCtx.createGain();
-            noiseGain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+            noiseGain.gain.setValueAtTime(0.5, audioCtx.currentTime);
             
             brownNoiseNode.connect(brownNoiseFilter);
-            brownNoiseFilter.connect(noiseGain);
-            noiseGain.connect(masterGain);
+            brownNoiseFilter.connect(noiseGain); noiseGain.connect(masterGain);
 
-            // Rare 12kHz Tension Peak Shimmer Node
+            // 12kHz Erection Accent Line
             erectIndicatorOsc = audioCtx.createOscillator();
             erectIndicatorOsc.type = 'sine';
             erectIndicatorOsc.frequency.setValueAtTime(12000, audioCtx.currentTime);
-            erectGain = audioCtx.createGain();
-            erectGain.gain.setValueAtTime(0, audioCtx.currentTime);
-            
-            erectIndicatorOsc.connect(erectGain);
-            erectGain.connect(masterGain);
+            erectGain = audioCtx.createGain(); erectGain.gain.setValueAtTime(0, audioCtx.currentTime);
+            erectIndicatorOsc.connect(erectGain); erectGain.connect(masterGain);
 
-            basePulseOsc.start();
-            analGrovelOsc.start();
-            brownNoiseNode.start();
-            erectIndicatorOsc.start();
-
-            // 12-Second Master Entrance Linear Fade
+            basePulseOsc.start(); analGrovelOsc.start(); brownNoiseNode.start(); erectIndicatorOsc.start();
             masterGain.gain.linearRampToValueAtTime(0.75, audioCtx.currentTime + 12.0);
-
             runMacroTimelineAutomations();
         }
 
@@ -189,20 +166,81 @@
         startBtn.addEventListener('click', async () => {
             if (!isEngineActive) {
                 initAudioEngine();
-                if (audioCtx.state === 'suspended') {
-                    await audioCtx.resume();
-                }
-                requestWakeLock();
-                isEngineActive = true;
+                if (audioCtx && audioCtx.state === 'suspended') { await audioCtx.resume(); }
+                requestWakeLock(); isEngineActive = true;
                 startBtn.classList.add('hidden');
                 statusText.innerHTML = "Somatic engine active.<br>Swells generating client-side.";
             }
         });
 
         sliderX.addEventListener('input', (e) => {
-            tweakX = e.target.value / 100;
-            xValText.innerText = `${e.target.value}%`;
+            tweakX = e.target.value / 100; xValText.innerText = `${e.target.value}%`;
             if (isEngineActive && audioCtx) {
-                let targetFreq = mapRange(tweakX, 0, 1, 40, 75);
+                let targetFreq = (tweakX * 35) + 40;
+                basePulseOsc.frequency.setTargetAtTime(targetFreq, audioCtx.currentTime, 0.1);
+            }
+        });
 
-                basePulseOsc.frequency.setTargetAtTime(targetFreq, audioCtx.currentTime, 0.1);}});sliderY.addEventListener('input', (e) => {tweakY = e.target.value / 100;yValText.innerText = ${e.target.value}%;if (isEngineActive && audioCtx) {let targetCutoff = mapRange(tweakY, 0, 1, 120, 480);brownNoiseFilter.frequency.setTargetAtTime(targetCutoff, audioCtx.currentTime, 0.2);}});function mapRange(value, inMin, inMax, outMin, outMax) {return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;}const sketch = (p) => {let maxRadius;p.setup = () => {let container = document.getElementById('canvas-container');let cnv = p.createCanvas(container.offsetWidth, container.offsetHeight);cnv.parent('canvas-container');p.frameRate(30);maxRadius = p.min(p.width, p.height) * 0.35;};p.windowResized = () => {let container = document.getElementById('canvas-container');p.resizeCanvas(container.offsetWidth, container.offsetHeight);maxRadius = p.min(p.width, p.height) * 0.35;};p.draw = () => {p.fill(2, 3, 12, 35);p.rect(0, 0, p.width, p.height);if (isEngineActive && globalIntroFade < 1.0) {globalIntroFade += 0.003;}waveTimeline += 0.005;p.translate(p.width / 2, p.height / 2);let totalWaveBands = 40;let simulatedSubSwell = p.pow(p.map(p.sin(p.frameCount * 0.035), -1, 1, 0, 1), 4);let simulatedHighErect = p.pow(p.map(p.cos(p.frameCount * 0.02), -1, 1, 0, 1), 6);p.noFill();for (let i = 0; i < totalWaveBands; i++) {let progress = i / totalWaveBands;let currentRadius = progress * maxRadius;let waveDeformA = p.sin(progress * p.TWO_PI * 2.5 - waveTimeline * 1.5);let waveDeformB = p.cos(progress * p.PI + waveTimeline * 1.0);let edgeFade = p.sin(progress * p.PI);let dynamicAlpha = p.pow(edgeFade, 1.6) * 190.0 * (isEngineActive ? globalIntroFade : 0.25);let colorNoise = p.noise(i * 0.04, waveTimeline * 0.2);let r = p.int(p.map(colorNoise, 0, 1, 0, 5));let g = p.int(p.map(colorNoise, 0, 1, 25, 120) + (simulatedHighErect * 80));let b = p.int(p.map(progress, 0, 1, 130, 255));p.stroke(r, g, b, dynamicAlpha);p.strokeWeight(p.map(progress, 0, 1, 0.8, 3.5) + (simulatedSubSwell * 2.5));p.beginShape();let wavePoints = 60;for (let j = 0; j <= wavePoints; j++) {let theta = (j / wavePoints) * p.TWO_PI;let jitter = p.sin(theta * 24.0 + p.frameCount) * (simulatedHighErect * 1.8);let noiseModifier = p.noise(p.cos(theta) * 0.4 + 1.0, p.sin(theta) * 0.4 + 1.0, waveTimeline);let totalSwellFactor = 1.0 + (waveDeformA * waveDeformB * 0.07) * (noiseModifier * (tweakX * 1.2));let finalRadius = (currentRadius * totalSwellFactor) + jitter;let x = finalRadius * p.cos(theta);let y = finalRadius * p.sin(theta);p.vertex(x, y);}p.endShape();}p.resetMatrix();p.noFill();p.stroke(2, 3, 12);p.strokeWeight(p.max(p.width, p.height) * 0.4);p.ellipse(p.width / 2, p.height / 2, p.max(p.width, p.height) + maxRadius * 2, p.max(p.width, p.height) + maxRadius * 2);};};new p5(sketch);
+        sliderY.addEventListener('input', (e) => {
+            tweakY = e.target.value / 100; yValText.innerText = `${e.target.value}%`;
+            if (isEngineActive && audioCtx) {
+                let targetCutoff = (tweakY * 360) + 120;
+                brownNoiseFilter.frequency.setTargetAtTime(targetCutoff, audioCtx.currentTime, 0.2);
+            }
+        });
+
+        const sketch = (p) => {
+            let maxRadius;
+            p.setup = () => {
+                let container = document.getElementById('canvas-container');
+                let cnv = p.createCanvas(container.offsetWidth, container.offsetHeight);
+                cnv.parent('canvas-container'); p.frameRate(30);
+                maxRadius = p.min(p.width, p.height) * 0.35;
+            };
+            p.windowResized = () => {
+                let container = document.getElementById('canvas-container');
+                p.resizeCanvas(container.offsetWidth, container.offsetHeight);
+                maxRadius = p.min(p.width, p.height) * 0.35;
+            };
+            p.draw = () => {
+                p.fill(2, 3, 12, 35); p.rect(0, 0, p.width, p.height);
+                if (isEngineActive && globalIntroFade < 1.0) { globalIntroFade += 0.003; }
+                waveTimeline += 0.005; p.translate(p.width / 2, p.height / 2);
+                let totalWaveBands = 40;
+                let simulatedSubSwell = p.pow(p.map(p.sin(p.frameCount * 0.035), -1, 1, 0, 1), 4);
+                let simulatedHighErect = p.pow(p.map(p.cos(p.frameCount * 0.02), -1, 1, 0, 1), 6);
+                p.noFill();
+                for (let i = 0; i < totalWaveBands; i++) {
+                    let progress = i / totalWaveBands; let currentRadius = progress * maxRadius;
+                    let waveDeformA = p.sin(progress * p.TWO_PI * 2.5 - waveTimeline * 1.5);
+                    let waveDeformB = p.cos(progress * p.PI + waveTimeline * 1.0);
+                    let edgeFade = p.sin(progress * p.PI);
+                    let dynamicAlpha = p.pow(edgeFade, 1.6) * 190.0 * (isEngineActive ? globalIntroFade : 0.25);
+                    let colorNoise = p.noise(i * 0.04, waveTimeline * 0.2);
+                    let r = p.int(p.map(colorNoise, 0, 1, 0, 5));
+                    let g = p.int(p.map(colorNoise, 0, 1, 25, 120) + (simulatedHighErect * 80));
+                    let b = p.int(p.map(progress, 0, 1, 130, 255));
+                    p.stroke(r, g, b, dynamicAlpha);
+                    p.strokeWeight(p.map(progress, 0, 1, 0.8, 3.5) + (simulatedSubSwell * 2.5));
+                    p.beginShape();
+                    let wavePoints = 60;
+                    for (let j = 0; j <= wavePoints; j++) {
+                        let theta = (j / wavePoints) * p.TWO_PI;
+                        let jitter = p.sin(theta * 24.0 + p.frameCount) * (simulatedHighErect * 1.8);
+                        let noiseModifier = p.noise(p.cos(theta) * 0.4 + 1.0, p.sin(theta) * 0.4 + 1.0, waveTimeline);
+                        let totalSwellFactor = 1.0 + (waveDeformA * waveDeformB * 0.07) * (noiseModifier * (tweakX * 1.2));
+                        let finalRadius = (currentRadius * totalSwellFactor) + jitter;
+                        let x = finalRadius * p.cos(theta); let y = finalRadius * p.sin(theta);
+                        p.vertex(x, y);
+                    }
+                    p.endShape();
+                }
+                p.resetMatrix(); p.noFill(); p.stroke(2, 3, 12);
+                p.strokeWeight(p.max(p.width, p.height) * 0.4);
+                p.ellipse(p.width / 2, p.height / 2, p.max(p.width, p.height) + maxRadius * 2, p.max(p.width, p.height) + maxRadius * 2);
+            };
+        };
+        new p5(sketch);
+    </script>
+</body>
+</html>
