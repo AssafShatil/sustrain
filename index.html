@@ -2,65 +2,65 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sustrain - State B Sandbox</title>
-    <!-- iOS Standalone App Navigation Hiding Configurations -->
+    <!-- iOS Standalone App UI Optimizations -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Sustrain">
-    <!-- Tailwind CSS for clean dark-mode styling -->
+    <!-- Tailwind CSS for modern layout design -->
     <script src="https://tailwindcss.com"></script>
-    <!-- p5.js for the organic visual wave portal (Processing Web Sister) -->
+    <!-- p5.js for cross-platform generative visuals -->
     <script src="https://cloudflare.com"></script>
 </head>
 <body class="bg-[#02030c] text-slate-200 min-h-screen flex flex-col justify-between items-center overflow-hidden font-sans select-none">
 
-    <!-- Branding Header -->
-    <header class="w-full py-4 text-center border-b border-blue-950/40 bg-[#02030c]/80 backdrop-blur z-10">
+    <!-- Header Block -->
+    <header class="w-full py-4 text-center border-b border-blue-950/40 bg-[#02030c]/80 backdrop-blur z-20">
         <h1 class="text-xl font-bold tracking-[0.2em] text-blue-400 uppercase">Sustrain</h1>
         <p class="text-xs text-slate-500 mt-0.5">Somatic Wave Architecture • State B</p>
     </header>
 
-    <!-- Visual Canvas & Centered Play Trigger -->
-    <main class="relative w-full flex-1 flex justify-center items-center">
-        <!-- p5.js Canvas embeds here -->
-        <div id="canvas-container" class="absolute inset-0 flex justify-center items-center z-0"></div>
+    <!-- Main Rendering Workspace -->
+    <main class="relative w-full flex-1 flex justify-center items-center overflow-hidden">
+        <!-- p5.js Canvas Wrapper -->
+        <div id="canvas-container" class="absolute inset-0 w-full h-full flex justify-center items-center z-0"></div>
 
-        <!-- Start Button Overlay -->
-        <div class="relative z-10 flex flex-col items-center gap-6 max-w-sm w-full px-6">
-            <button id="start-btn" class="px-8 py-3 bg-blue-600 hover:bg-blue-500 active:scale-95 transition-all rounded-full font-semibold text-sm tracking-wider uppercase shadow-lg shadow-blue-500/20 border border-blue-400/30">
+        <!-- Interactive Core Trigger Overlay -->
+        <div class="relative z-10 flex flex-col items-center gap-6 max-w-sm w-full px-6 text-center">
+            <button id="start-btn" class="px-8 py-4 bg-blue-600 hover:bg-blue-500 active:scale-95 transition-all rounded-full font-bold text-sm tracking-wider uppercase shadow-xl shadow-blue-500/20 border border-blue-400/30">
                 Initialize Sound World
             </button>
-            <p id="status-text" class="text-xs text-slate-400 font-mono opacity-60 text-center max-w-[220px]">
-                Audio engine offline. Connect headphones before starting.
+            <p id="status-text" class="text-xs text-slate-400 font-mono opacity-80 max-w-[240px] bg-slate-950/60 px-4 py-2 rounded-xl backdrop-blur-sm border border-blue-950/30">
+                Audio & visuals offline.<br>Connect headphones and tap to boot.
             </p>
         </div>
     </main>
 
-    <!-- Bottom Tweak Panel (Interactive Touch Sliders) -->
-    <footer class="w-full p-6 bg-gradient-to-t from-[#02030c] to-transparent z-10 max-w-md">
-        <div class="space-y-5 bg-slate-900/40 border border-blue-950/50 rounded-2xl p-5 backdrop-blur-md shadow-2xl">
-            <!-- X-Axis Component Tweak -->
+    <!-- Bottom Adjustment Deck (Touch Responsive Sliders) -->
+    <footer class="w-full p-6 bg-gradient-to-t from-[#02030c] via-[#02030c]/90 to-transparent z-20 max-w-md">
+        <div class="space-y-5 bg-slate-900/60 border border-blue-950/50 rounded-2xl p-5 backdrop-blur-md shadow-2xl">
+            <!-- X-Axis Control Grid -->
             <div class="space-y-1.5">
                 <div class="flex justify-between text-xs font-semibold tracking-wider text-slate-400">
                     <span class="uppercase">Swell Density (X)</span>
                     <span id="x-val" class="font-mono text-blue-400">50%</span>
                 </div>
-                <input id="slider-x" type="range" min="0" max="100" value="50" class="w-full h-1 bg-blue-950 rounded-lg appearance-none cursor-pointer accent-blue-500 transition-all">
+                <input id="slider-x" type="range" min="0" max="100" value="50" class="w-full h-1.5 bg-blue-950 rounded-lg appearance-none cursor-pointer accent-blue-500 transition-all">
             </div>
 
-            <!-- Y-Axis Component Tweak -->
+            <!-- Y-Axis Control Grid -->
             <div class="space-y-1.5">
                 <div class="flex justify-between text-xs font-semibold tracking-wider text-slate-400">
                     <span class="uppercase">Pleasure Intensity (Y)</span>
                     <span id="y-val" class="font-mono text-blue-400">50%</span>
                 </div>
-                <input id="slider-y" type="range" min="0" max="100" value="50" class="w-full h-1 bg-blue-950 rounded-lg appearance-none cursor-pointer accent-blue-500 transition-all">
+                <input id="slider-y" type="range" min="0" max="100" value="50" class="w-full h-1.5 bg-blue-950 rounded-lg appearance-none cursor-pointer accent-blue-500 transition-all">
             </div>
         </div>
     </footer>
 
-    <!-- Web Audio Engine & Visual Logic Script -->
+    <!-- Interactive Execution Layer -->
     <script>
         let audioCtx = null;
         let isEngineActive = false;
@@ -79,19 +79,17 @@
         const xValText = document.getElementById('x-val');
         const yValText = document.getElementById('y-val');
 
-        // Wake Lock Function to prevent iPhone from sleeping/dimming during practice
+        // Wake Lock API handles keeping mobile displays active during hands-free sessions
         async function requestWakeLock() {
             try {
                 if ('wakeLock' in navigator) {
                     wakeLock = await navigator.wakeLock.request('screen');
-                    console.log("Wake lock active.");
                 }
             } catch (err) {
-                console.warn(`Wake lock failed: ${err.message}`);
+                console.warn(`Wake lock error: ${err.message}`);
             }
         }
 
-        // Keep wake lock active if user leaves browser and returns
         document.addEventListener('visibilitychange', async () => {
             if (wakeLock !== null && document.visibilityState === 'visible') {
                 wakeLock = await navigator.wakeLock.request('screen');
@@ -102,10 +100,10 @@
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             
             masterGain = audioCtx.createGain();
-            masterGain.gain.setValueAtTime(0, audioCtx.currentTime); // Force 0 on boot
+            masterGain.gain.setValueAtTime(0, audioCtx.currentTime); 
             masterGain.connect(audioCtx.destination);
 
-            // 55Hz Base Pulse (Base of Penis Erectile Anchor)
+            // 55Hz Somatic Pulse Generator
             basePulseOsc = audioCtx.createOscillator();
             basePulseOsc.type = 'sine';
             basePulseOsc.frequency.setValueAtTime(55, audioCtx.currentTime);
@@ -114,7 +112,7 @@
             basePulseOsc.connect(pulseGain);
             pulseGain.connect(masterGain);
 
-            // 35Hz Pelvic/Anus Grovel (Deep Muscle Relaxation Wave)
+            // 35Hz Grounding/Anus Pelvic Vibrator
             analGrovelOsc = audioCtx.createOscillator();
             analGrovelOsc.type = 'sine';
             analGrovelOsc.frequency.setValueAtTime(35, audioCtx.currentTime);
@@ -123,7 +121,7 @@
             analGrovelOsc.connect(grovelGain);
             grovelGain.connect(masterGain);
 
-            // Warm Brown Noise Swells (Heat Waves)
+            // Velvet Noise Engine Buffer
             const bufferSize = 2 * audioCtx.sampleRate;
             const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
             const output = noiseBuffer.getChannelData(0);
@@ -145,7 +143,7 @@
             brownNoiseFilter.connect(noiseGain);
             noiseGain.connect(masterGain);
 
-            // Rare 12kHz Erection Indicator (High Firmness Warning Line)
+            // Rare 12kHz Tension Peak Shimmer Node
             erectIndicatorOsc = audioCtx.createOscillator();
             erectIndicatorOsc.type = 'sine';
             erectIndicatorOsc.frequency.setValueAtTime(12000, audioCtx.currentTime);
@@ -160,7 +158,7 @@
             brownNoiseNode.start();
             erectIndicatorOsc.start();
 
-            // 12-Second Smooth Macro Entry Fade
+            // 12-Second Master Entrance Linear Fade
             masterGain.gain.linearRampToValueAtTime(0.75, audioCtx.currentTime + 12.0);
 
             runMacroTimelineAutomations();
@@ -169,7 +167,6 @@
         function runMacroTimelineAutomations() {
             setInterval(() => {
                 if (!isEngineActive) return;
-                // Periodic Sub-Bass Prostate Accent Wave (24Hz Surge)
                 let now = audioCtx.currentTime;
                 analGrovelOsc.frequency.setValueAtTime(35, now);
                 analGrovelOsc.frequency.exponentialRampToValueAtTime(24, now + 6.0);
@@ -179,7 +176,6 @@
 
             setInterval(() => {
                 if (!isEngineActive) return;
-                // Rare High-Frequency Erection Shimmer (12kHz - 14.5kHz)
                 let now = audioCtx.currentTime;
                 erectGain.gain.setValueAtTime(0, now);
                 erectGain.gain.linearRampToValueAtTime(0.02, now + 2.0);
@@ -190,18 +186,21 @@
             }, 75000);
         }
 
-        // Sliders & Controls Event Handling
-        startBtn.addEventListener('click', () => {
+        startBtn.addEventListener('click', async () => {
             if (!isEngineActive) {
                 initAudioEngine();
+                if (audioCtx.state === 'suspended') {
+                    await audioCtx.resume();
+                }
                 requestWakeLock();
                 isEngineActive = true;
                 startBtn.classList.add('hidden');
-                statusText.innerText = "Somatic engine running fully client-side.";
+                statusText.innerHTML = "Somatic engine active.<br>Swells generating client-side.";
             }
         });
 
         sliderX.addEventListener('input', (e) => {
             tweakX = e.target.value / 100;
             xValText.innerText = `${e.target.value}%`;
-if (isEngineActive && audioCtx) {let targetFreq = mapRange(tweakX, 0, 1, 40, 75);basePulseOsc.frequency.setTargetAtTime(targetFreq, audioCtx.currentTime, 0.1);}});sliderY.addEventListener('input', (e) => {tweakY = e.target.value / 100;yValText.innerText = ${e.target.value}%;if (isEngineActive && audioCtx) {let targetCutoff = mapRange(tweakY, 0, 1, 120, 480);brownNoiseFilter.frequency.setTargetAtTime(targetCutoff, audioCtx.currentTime, 0.2);}});function mapRange(value, inMin, inMax, outMin, outMax) {return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;}// Processing Logic (Ported to native p5.js engine)const sketch = (p) => {p.setup = () => {let cnv = p.createCanvas(800, 800);cnv.parent('canvas-container');p.frameRate(30);};p.draw = () => {p.fill(2, 3, 12, 35);p.rect(0, 0, p.width, p.height);if (isEngineActive && globalIntroFade < 1.0) {globalIntroFade += 0.003;}waveTimeline += 0.005;p.translate(p.width / 2, p.height / 2);let totalWaveBands = 48;let maxRadius = p.width * 0.22;let simulatedSubSwell = p.pow(p.map(p.sin(p.frameCount * 0.035), -1, 1, 0, 1), 4);let simulatedHighErect = p.pow(p.map(p.cos(p.frameCount * 0.02), -1, 1, 0, 1), 6);p.noFill();for (let i = 0; i < totalWaveBands; i++) {let progress = i / totalWaveBands;let currentRadius = progress * maxRadius;let waveDeformA = p.sin(progress * p.TWO_PI * 2.5 - waveTimeline * 1.5);let waveDeformB = p.cos(progress * p.PI + waveTimeline * 1.0);let edgeFade = p.sin(progress * p.PI);let dynamicAlpha = p.pow(edgeFade, 1.6) * 190.0 * (isEngineActive ? globalIntroFade : 0.2);let colorNoise = p.noise(i * 0.04, waveTimeline * 0.2);let r = p.int(p.map(colorNoise, 0, 1, 0, 5));let g = p.int(p.map(colorNoise, 0, 1, 25, 120) + (simulatedHighErect * 80));let b = p.int(p.map(progress, 0, 1, 130, 255));p.stroke(r, g, b, dynamicAlpha);p.strokeWeight(p.map(progress, 0, 1, 0.8, 3.5) + (simulatedSubSwell * 2.5));p.beginShape();let wavePoints = 80;for (let j = 0; j <= wavePoints; j++) {let theta = (j / wavePoints) * p.TWO_PI;let jitter = p.sin(theta * 24.0 + p.frameCount) * (simulatedHighErect * 1.8);let noiseModifier = p.noise(p.cos(theta) * 0.4 + 1.0, p.sin(theta) * 0.4 + 1.0, waveTimeline);let totalSwellFactor = 1.0 + (waveDeformA * waveDeformB * 0.07) * (noiseModifier * (tweakX * 1.2));let finalRadius = (currentRadius * totalSwellFactor) + jitter;let x = finalRadius * p.cos(theta);let y = finalRadius * p.sin(theta);p.vertex(x, y);}p.endShape();}// Center Hollow Vignette Maskp.resetMatrix();p.noFill();p.stroke(2, 3, 12);p.strokeWeight(310);p.ellipse(p.width / 2, p.height / 2, p.width + 50, p.height + 50);};};new p5(sketch);
+            if (isEngineActive && audioCtx) {
+                let targetFreq = mapRange(tweakX, 0, 1, 40, 75);
